@@ -96,6 +96,7 @@ void setup(void)
 {
  
   pinMode(6, OUTPUT);
+  pinMode(5, OUTPUT);
   pinMode(A1, OUTPUT);
   Serial.begin(115200);
   Serial.println(F("Adafruit Bluefruit Command Mode Example"));
@@ -187,9 +188,10 @@ void loop(void)
   if(strcmp(ble.buffer, "1") == 0) {
     Serial.println("Right");
     digitalWrite(6,HIGH);
+    digitalWrite(5, HIGH);
   } else {
-    
     digitalWrite(6,LOW);
+    digitalWrite(5, LOW);
   }
   
   ble.waitForOK();
