@@ -156,24 +156,7 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  // Check for user input
-  char inputs[BUFSIZE+1];
-
-  if ( getUserInput(inputs, BUFSIZE) )
-  {
-    // Send characters to Bluefruit
-    Serial.print("[Send] ");
-    Serial.println(inputs);
-
-    ble.print("AT+BLEUARTTX=");
-    ble.println(inputs);
-
-    // check response stastus
-    if (! ble.waitForOK() ) {
-      Serial.println(F("Failed to send?"));
-    }
-  }
-
+ 
   // Check for incoming characters from Bluefruit
   ble.println("AT+BLEUARTRX");
   ble.readline();
@@ -186,40 +169,19 @@ void loop(void)
 
   Serial.println(ble.buffer);
   if(strcmp(ble.buffer, "1") == 0) {
-    Serial.println("Right");
-    digitalWrite(6,HIGH);
-    digitalWrite(5, HIGH);
-  } else {
-    digitalWrite(6,LOW);
-    digitalWrite(5, LOW);
-  }
+    service(2000, 10000);
+  } 
   
   ble.waitForOK();
 }
 
-/**************************************************************************/
-/*!
-    @brief  Checks for user input (via the Serial Monitor)
-*/
-/**************************************************************************/
-bool getUserInput(char buffer[], uint8_t maxSize)
-{
-  // timeout in 100 milliseconds
-  TimeoutTimer timeout(100);
 
-  memset(buffer, 0, maxSize);
-  while( (!Serial.available()) && !timeout.expired() ) { delay(1); }
-
-  if ( timeout.expired() ) return false;
-
-  delay(2);
-  uint8_t count=0;
-  do
-  {
-    count += Serial.readBytes(buffer+count, maxSize);
-    delay(2);
-  } while( (count < maxSize) && (Serial.available()) );
-
-  return true;
-
+void service(int delay1, int delay2) {
+    digitalWrite(6,HIGH);
+    delay(delay1);
+    digitalWrite(6,LOW);
+    digitalWrite(5, HIGH);
+    delay(delay2);
+    digitalWrite(5, LOW);
 }
+
