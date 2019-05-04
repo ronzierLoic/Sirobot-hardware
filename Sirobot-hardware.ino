@@ -160,28 +160,72 @@ void loop(void)
   // Check for incoming characters from Bluefruit
   ble.println("AT+BLEUARTRX");
   ble.readline();
-  if (strcmp(ble.buffer, "OK") == 0) {
-    // no data
-    return;
-  }
-  // Some data was found, its in the buffer
-  // Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
 
-  Serial.println(ble.buffer);
-  if(strcmp(ble.buffer, "1") == 0) {
-    service(2000, 10000);
-  } 
+  Serial.println(ble.buffer[1]);
+
+  int sirop = ble.buffer[0] - '0';
+  int siropParameter = ble.buffer[1] - '0';
+  int waterParameter = ble.buffer[2] - '0';
+
+  switch(sirop){
+    case 0 : 
+        Serial.println("Water");
+        serviceWater(waterParameter);
+        break;
+    case 9 : 
+        Serial.println("Sirop");
+        serviceSirop(siropParameter);
+        break;
+    default : 
+      Serial.println("Sirop + water");
+      serviceSirop(siropParameter);
+      serviceWater(waterParameter);
+      break;
+  }
+
   
   ble.waitForOK();
 }
 
 
-void service(int delay1, int delay2) {
-    digitalWrite(6,HIGH);
-    delay(delay1);
-    digitalWrite(6,LOW);
-    digitalWrite(5, HIGH);
-    delay(delay2);
-    digitalWrite(5, LOW);
+void serviceSirop(int siropParameter) {
+  switch(siropParameter) {
+    case 1:
+      Serial.println("Sirop low");
+      onValve(6,2000);
+      break;
+    case 2:
+      Serial.println("Sirop way");
+      onValve(6,2500);
+      break;
+    case 3:
+      Serial.println("Sirop lot");
+      onValve(6,3000);
+      break;
+  }
 }
+
+void serviceWater(int waterParameter) {
+  switch(waterParameter) {
+    case 1:
+      Serial.println("Water low");
+      onValve(5,5500);
+      break;
+    case 2:
+      Serial.println("Water way");
+      onValve(5,6000);
+      break;
+    case 3:
+      Serial.println("Water lot");
+      onValve(5,6500);
+      break;
+  }
+}
+
+void onValve(int valve, int delay1) {
+    digitalWrite(valve,HIGH);
+    delay(delay1);
+    digitalWrite(valve,LOW);
+}
+
 
